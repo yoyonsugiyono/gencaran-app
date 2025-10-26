@@ -372,9 +372,13 @@
          * Membuat Prompt Dinamis dan Skema JSON berdasarkan input pengguna
          */
         function buildDynamicPromptAndSchema(inputs) {
+            // Ambil nama guru dari footer di dokumen, bukan di dalam form
+            const namaGuruElement = document.querySelector('footer p span.font-semibold');
+            const namaGuru = namaGuruElement ? namaGuruElement.textContent.trim() : "Guru"; // Fallback jika tidak ketemu
+
             let prompt = `
                 Anda adalah asisten ahli penyusun perangkat ajar (Modul Ajar/RPP) Kurikulum Merdeka.
-                Saya adalah seorang guru: ${form.querySelector('footer p span.font-semibold').textContent.trim()}
+                Saya adalah seorang guru: ${namaGuru}
                 Tolong buatkan draf perangkat ajar berdasarkan informasi berikut:
                 
                 - Jenjang/Kelas: ${inputs.jenjang}
@@ -726,4 +730,5 @@
     </script>
 </body>
 </html>
+
 
