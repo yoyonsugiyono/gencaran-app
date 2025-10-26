@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Mengganti judul aplikasi -->
+    <title>GENCARAN - Generator Perencanaan Pembelajaran</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Impor library Marked.js untuk render Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #a8a29e; /* stone-400 */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #78716c; /* stone-500 */
+        }
+        /* Style untuk output Markdown */
+        .markdown-output h1, .markdown-output h2, .markdown-output h3 {
+            font-weight: 700;
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .markdown-output h1 { font-size: 1.875rem; line-height: 2.25rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.25rem; }
+        .markdown-output h2 { font-size: 1.5rem; line-height: 2rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.25rem;}
+        .markdown-output h3 { font-size: 1.25rem; line-height: 1.75rem; }
+        .markdown-output p { margin-bottom: 1rem; line-height: 1.6; }
+        .markdown-output ul, .markdown-output ol { margin-left: 1.5rem; margin-bottom: 1rem; list-style-position: outside; }
+        .markdown-output ul { list-style-type: disc; }
+        .markdown-output ol { list-style-type: decimal; }
+        .markdown-output li { margin-bottom: 0.5rem; }
+        .markdown-output table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            display: block;
+        }
+        .markdown-output th, .markdown-output td {
+            border: 1px solid #d1d5db;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        .markdown-output th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+        .markdown-output pre {
+            background-color: #1f2937;
+            color: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        .markdown-output code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .markdown-output pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        .markdown-output blockquote {
+            border-left: 4px solid #d1d5db;
+            padding-left: 1rem;
+            margin-left: 0;
+            margin-bottom: 1rem;
+            font-style: italic;
+            color: #4b5563;
+        }
+    </style>
+</head>
+<body class="bg-stone-100 h-full overflow-hidden">
+    <div class="flex flex-col md:flex-row h-screen">
+
+        <!-- Kolom Input (Sticky) -->
+        <div class="w-full md:w-1/3 lg:w-2/5 h-1/2 md:h-screen overflow-y-auto bg-white shadow-lg p-6 md:p-8">
+            <div class="sticky top-0 bg-white pb-4 z-10">
+                <div class="text-center md:text-left">
+                    <!-- Judul Aplikasi Diubah -->
+                    <h1 class="text-3xl md:text-4xl font-bold text-stone-800">GENCARAN</h1>
+                    <!-- Subjudul Diubah -->
+                    <h2 class="text-lg md:text-xl text-stone-600 mt-2">Aplikasi AI (Generasi Perencanaan Pembelajaran) untuk membuat RPP/Modul Ajar lengkap.</h2>
+                </div>
+            </div>
+            
+            <form id="rpp-form" class="space-y-6 mt-6">
+                
+                <!-- Bagian 1: Informasi Dasar -->
+                <fieldset class="border border-stone-300 p-4 rounded-lg">
+                    <legend class="text-xl font-semibold text-stone-700 px-2">1. Informasi Dasar</legend>
+                    <div class="space-y-4 mt-2">
+                        <div>
+                            <label for="jenjang" class="block text-sm font-medium text-stone-700">Jenjang/Kelas</label>
+                            <input type="text" id="jenjang" placeholder="Contoh: SD Kelas 4" class="mt-1 block w-full px-3 py-2 bg-white border border-stone-300 rounded-md shadow-sm focus:outline-none focus:ring-stone-500 focus:border-stone-500">
+                        </div>
+                        <div>
+                            <label for="mapel" class="block text-sm font-medium text-stone-700">Mata Pelajaran</label>
+                            <input type="text" id="mapel" placeholder="Contoh: IPAS" class="mt-1 block w-full px-3 py-2 bg-white border border-stone-300 rounded-md shadow-sm focus:outline-none focus:ring-stone-500 focus:border-stone-500">
+                        </div>
+                        <div>
+                            <label for="materi" class="block text-sm font-medium text-stone-700">Materi Pokok / Topik</label>
+                            <input type="text" id="materi" placeholder="Contoh: Fotosintesis" class="mt-1 block w-full px-3 py-2 bg-white border border-stone-300 rounded-md shadow-sm focus:outline-none focus:ring-stone-500 focus:border-stone-500">
+                        </div>
+                        <div>
+                            <label for="tp" class="block text-sm font-medium text-stone-700">Tujuan Pembelajaran (TP/CP)</label>
+                            <textarea id="tp" rows="3" placeholder="Siswa dapat menjelaskan proses fotosintesis..." class="mt-1 block w-full px-3 py-2 bg-white border border-stone-300 rounded-md shadow-sm focus:outline-none focus:ring-stone-500 focus:border-stone-500"></textarea>
+                        </div>
+                        <div>
+                            <label for="alokasi" class="block text-sm font-medium text-stone-700">Alokasi Waktu</label>
+                            <input type="text" id="alokasi" placeholder="Contoh: 2 JP (2 x 35 Menit)" class="mt-1 block w-full px-3 py-2 bg-white border border-stone-300 rounded-md shadow-sm focus:outline-none focus:ring-stone-500 focus:border-stone-500">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Bagian 2: Pedagogi & Aktivitas -->
+                <fieldset class="border border-stone-300 p-4 rounded-lg">
+                    <legend class="text-xl font-semibold text-stone-700 px-2">2. Pedagogi & Aktivitas</legend>
+                    <div class="space-y-4 mt-2">
+                        <div>
+                            <label for="model" class="block text-sm font-medium text-stone-700">Model Pembelajaran (Opsional)</label>
+                            <input type="text" id="model" placeholder="Contoh: Problem Based Learning (PBL)" class="mt-1 block w-full px-3 py-2 bg-white border border-stone-300 rounded-md shadow-sm focus:outline-none focus:ring-stone-500 focus:border-stone-500">
+                        </div>
+                        <div>
+                            <label for="keterampilan" class="block text-sm font-medium text-stone-700">Keterampilan yang Dinilai (Opsional)</label>
+                            <input type="text" id="keterampilan" placeholder="Contoh: Kemampuan presentasi, Kerjasama kelompok" class="mt-1 block w-full px-3 py-2 bg-white border border-stone-300 rounded-md shadow-sm focus:outline-none focus:ring-stone-500 focus:border-stone-500">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Bagian 3: Generator Konten AI (Opsional) -->
+                <fieldset class="border border-stone-300 p-4 rounded-lg">
+                    <legend class="text-xl font-semibold text-stone-700 px-2">3. Buat Konten AI (Opsional)</legend>
+                    <div class="space-y-3 mt-2">
+                        <p class="text-sm text-stone-600">Pilih konten tambahan yang ingin Anda buat secara otomatis:</p>
+                        
+                        <div class="relative flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="buat-rangkuman" name="konten-ai" type="checkbox" checked class="h-4 w-4 text-stone-600 border-stone-300 rounded focus:ring-stone-500">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="buat-rangkuman" class="font-medium text-stone-700">Rangkuman Materi & Pertanyaan Pemantik</label>
+                            </div>
+                        </div>
+
+                        <div class="relative flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="buat-diferensiasi" name="konten-ai" type="checkbox" checked class="h-4 w-4 text-stone-600 border-stone-300 rounded focus:ring-stone-500">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="buat-diferensiasi" class="font-medium text-stone-700">Ide Pembelajaran Diferensiasi</label>
+                            </div>
+                        </div>
+
+                        <div class="relative flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="buat-sumatif" name="konten-ai" type="checkbox" checked class="h-4 w-4 text-stone-600 border-stone-300 rounded focus:ring-stone-500">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="buat-sumatif" class="font-medium text-stone-700">Asesmen Sumatif (5 Soal Pilihan Ganda + Kunci)</label>
+                            </div>
+                        </div>
+                        
+                        <div class="relative flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="buat-lkpd" name="konten-ai" type="checkbox" class="h-4 w-4 text-stone-600 border-stone-300 rounded focus:ring-stone-500">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="buat-lkpd" class="font-medium text-stone-700">LKPD (Lembar Kerja Peserta Didik)</label>
+                            </div>
+                        </div>
+                        
+                        <div class="relative flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="buat-rubrik" name="konten-ai" type="checkbox" class="h-4 w-4 text-stone-600 border-stone-300 rounded focus:ring-stone-500">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="buat-rubrik" class="font-medium text-stone-700">Rubrik Penilaian (jika Keterampilan diisi)</label>
+                            </div>
+                        </div>
+
+                        <div class="relative flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="buat-icebreaking" name="konten-ai" type="checkbox" class="h-4 w-4 text-stone-600 border-stone-300 rounded focus:ring-stone-500">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="buat-icebreaking" class="font-medium text-stone-700">Ide Ice Breaking (Pencair Suasana)</label>
+                            </div>
+                        </div>
+
+                        <div class="relative flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="buat-video" name="konten-ai" type="checkbox" class="h-4 w-4 text-stone-600 border-stone-300 rounded focus:ring-stone-500">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="buat-video" class="font-medium text-stone-700">Rekomendasi 3 Video YouTube</label>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </fieldset>
+
+                <!-- Tombol Aksi -->
+                <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                    <button type="submit" id="generate-btn" class="w-full inline-flex justify-center py-3 px-6 border border-transparent shadow-lg text-base font-semibold rounded-lg text-white bg-stone-700 hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500 transition-colors duration-200">
+                        <svg id="generate-icon" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <svg id="generate-text-icon" class="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.624L16.5 21.75l-.398-1.126a3.375 3.375 0 00-2.456-2.456L12.5 18l1.126-.398a3.375 3.375 0 002.456-2.456L16.5 14.25l.398 1.126a3.375 3.375 0 002.456 2.456L20.5 18l-1.126.398a3.375 3.375 0 00-2.456 2.456z" />
+                        </svg>
+                        <span id="generate-text">Buat Perangkat Ajar</span>
+                    </button>
+                    <button type="button" id="copy-btn" class="w-full sm:w-auto inline-flex justify-center py-3 px-6 border border-stone-400 shadow-sm text-base font-semibold rounded-lg text-stone-700 bg-white hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-400 transition-colors duration-200">
+                        <svg class="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m1.5 12.75l-1.5-1.5m0 0l-1.5-1.5m1.5 1.5l1.5 1.5m1.5-1.5l1.5-1.5m7.5-1.5h-6.375c.63-.63.937-1.49.937-2.375a3.75 3.75 0 00-3.75-3.75S6.375 7.875 6.375 9.375s1.687 2.625 3.75 2.625c.884 0 1.744-.307 2.375-.937z" />
+                        </svg>
+                        <span id="copy-text">Salin Hasil</span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Footer -->
+            <footer class="mt-8 pt-6 border-t border-stone-200">
+                <p class="text-xs text-stone-500 text-center">
+                    Dimodifikasi oleh: <br>
+                    <span class="font-semibold text-stone-600">Yoyon Sugiyono, S.Pd., M.Pd., Gr.</span><br>
+                    UPTD SDN Margantoko 2, Kec. Jrengik, Kab. Sampang (082331769605)
+                </p>
+                <p class="text-xs text-stone-400 text-center mt-2">
+                    Aplikasi ini ditenagai oleh Gemini AI.
+                </p>
+            </footer>
+        </div>
+
+        <!-- Kolom Output (Scrollable) -->
+        <div class="w-full md:w-2/3 lg:w-3/5 h-1/2 md:h-screen overflow-y-auto bg-stone-50 p-6 md:p-10">
+            <div id="output-container" class="max-w-none">
+                
+                <!-- Pesan Error -->
+                <div id="error-message" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert">
+                    <p class="font-bold">Terjadi Kesalahan</p>
+                    <p id="error-text">Maaf, terjadi masalah saat mengambil data.</p>
+                </div>
+
+                <!-- Placeholder Awal -->
+                <div id="placeholder" class="text-center text-stone-500 mt-16">
+                    <svg class="mx-auto h-24 w-24 text-stone-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                    </svg>
+                    <h3 class="mt-4 text-2xl font-semibold text-stone-600">Hasil Perangkat Ajar Anda</h3>
+                    <p class="mt-2 text-base text-stone-500">Isi formulir di sebelah kiri dan klik "Buat Perangkat Ajar".<br>Hasil lengkap akan muncul di sini dalam format Markdown.</p>
+                </div>
+                
+                <!-- Konten Hasil (Markdown) -->
+                <div id="output" class="markdown-output"></div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- Impor Firebase (jika diperlukan untuk fitur masa depan) ---
+        // import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // ... (impor lain)
+
+        // --- Konfigurasi API ---
+        // Kunci API HARUS dibiarkan kosong ("") agar Canvas dapat memasukkannya saat runtime.
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+        // --- Elemen DOM ---
+        const form = document.getElementById('rpp-form');
+        const output = document.getElementById('output');
+        const placeholder = document.getElementById('placeholder');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        
+        // Elemen Tombol
+        const generateBtn = document.getElementById('generate-btn');
+        const generateIcon = document.getElementById('generate-icon');
+        const generateText = document.getElementById('generate-text');
+        const generateTextIcon = document.getElementById('generate-text-icon');
+        const copyBtn = document.getElementById('copy-btn');
+        const copyText = document.getElementById('copy-text');
+
+        // --- Variabel Global ---
+        let currentMarkdownOutput = ""; // Menyimpan output mentah untuk disalin
+
+        // --- Fungsi Utama ---
+
+        /**
+         * Menangani submit formulir
+         */
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // 1. Kumpulkan semua data input
+            const inputs = {
+                jenjang: document.getElementById('jenjang').value,
+                mapel: document.getElementById('mapel').value,
+                materi: document.getElementById('materi').value,
+                tp: document.getElementById('tp').value,
+                alokasi: document.getElementById('alokasi').value,
+                model: document.getElementById('model').value,
+                keterampilan: document.getElementById('keterampilan').value,
+                // Opsi AI
+                buatRangkuman: document.getElementById('buat-rangkuman').checked,
+                buatDiferensiasi: document.getElementById('buat-diferensiasi').checked,
+                buatSumatif: document.getElementById('buat-sumatif').checked,
+                buatLkpd: document.getElementById('buat-lkpd').checked,
+                buatRubrik: document.getElementById('buat-rubrik').checked,
+                buatIceBreaking: document.getElementById('buat-icebreaking').checked,
+                buatVideo: document.getElementById('buat-video').checked,
+            };
+
+            // 2. Validasi input dasar
+            if (!inputs.jenjang || !inputs.mapel || !inputs.materi || !inputs.tp) {
+                showError("Mohon isi semua bidang di Bagian 1: Informasi Dasar (Jenjang, Mapel, Materi, dan TP).");
+                return;
+            }
+
+            // 3. Ubah status UI menjadi memuat
+            setLoading(true);
+            
+            try {
+                // 4. Buat prompt dan skema JSON dinamis
+                const { prompt, jsonSchema } = buildDynamicPromptAndSchema(inputs);
+
+                // 5. Panggil API
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: jsonSchema,
+                    },
+                };
+
+                const resultJson = await callGeminiAPI(payload);
+
+                // 6. Render hasil
+                renderOutput(resultJson, inputs);
+
+                // 7. Sembunyikan error jika ada
+                hideError();
+
+            } catch (error) {
+                console.error("Error during API call or rendering:", error);
+                showError(error.message || "Terjadi kesalahan yang tidak diketahui.");
+            } finally {
+                // 8. Kembalikan status UI
+                setLoading(false);
+            }
+        });
+
+        /**
+         * Membuat Prompt Dinamis dan Skema JSON berdasarkan input pengguna
+         */
+        function buildDynamicPromptAndSchema(inputs) {
+            let prompt = `
+                Anda adalah asisten ahli penyusun perangkat ajar (Modul Ajar/RPP) Kurikulum Merdeka.
+                Saya adalah seorang guru: ${form.querySelector('footer p span.font-semibold').textContent.trim()}
+                Tolong buatkan draf perangkat ajar berdasarkan informasi berikut:
+                
+                - Jenjang/Kelas: ${inputs.jenjang}
+                - Mata Pelajaran: ${inputs.mapel}
+                - Materi Pokok: ${inputs.materi}
+                - Alokasi Waktu: ${inputs.alokasi}
+                - Tujuan Pembelajaran: ${inputs.tp}
+                ${inputs.model ? `- Model Pembelajaran: ${inputs.model}` : ''}
+                ${inputs.keterampilan ? `- Keterampilan yang Dinilai: ${inputs.keterampilan}` : ''}
+
+                Buatkan konten-konten berikut dalam format JSON yang terstruktur. Pastikan semua teks dalam format Markdown yang rapi:
+            `;
+
+            // Objek skema JSON dasar
+            const schemaProperties = {
+                "langkah_pembelajaran": {
+                    "type": "OBJECT",
+                    "description": "Langkah-langkah pembelajaran (Pendahuluan, Inti, Penutup) dalam format Markdown. Jika Model Pembelajaran (misal: PBL) disebutkan, buat sintaksnya dengan jelas.",
+                    "properties": {
+                        "pendahuluan": { "type": "STRING", "description": "Kegiatan Pendahuluan (termasuk apersepsi)." },
+                        "inti": { "type": "STRING", "description": "Kegiatan Inti (termasuk sintaks model pembelajaran jika ada)." },
+                        "penutup": { "type": "STRING", "description": "Kegiatan Penutup (termasuk refleksi)." }
+                    },
+                    "propertyOrdering": ["pendahuluan", "inti", "penutup"]
+                },
+                "asesmen_formatif": {
+                    "type": "STRING",
+                    "description": "Ide asesmen formatif (selama proses pembelajaran) untuk mengecek pemahaman siswa."
+                }
+            };
+            
+            // Properti yang akan di-render di urutan pertama
+            const outputRenderOrder = [
+                { key: "langkah_pembelajaran", title: "A. Langkah-Langkah Pembelajaran" },
+            ];
+
+            // Menambahkan properti dinamis ke prompt dan skema
+            if (inputs.buatRangkuman) {
+                prompt += "\n- Rangkuman Materi dan Pertanyaan Pemantik.";
+                schemaProperties["rangkuman_materi"] = {
+                    "type": "STRING",
+                    "description": "Rangkuman materi pokok (poin-poin kunci) dan 3 pertanyaan pemantik. Diformat dalam Markdown."
+                };
+                outputRenderOrder.push({ key: "rangkuman_materi", title: "B. Rangkuman Materi & Pertanyaan Pemantik" });
+            }
+
+            if (inputs.buatDiferensiasi) {
+                prompt += "\n- Ide Pembelajaran Diferensiasi (Konten, Proses, Produk).";
+                schemaProperties["diferensiasi"] = {
+                    "type": "OBJECT",
+                    "description": "Ide pembelajaran diferensiasi.",
+                    "properties": {
+                        "konten": { "type": "STRING", "description": "Ide diferensiasi konten." },
+                        "proses": { "type": "STRING", "description": "Ide diferensiasi proses." },
+                        "produk": { "type": "STRING", "description": "Ide diferensiasi produk." }
+                    },
+                    "propertyOrdering": ["konten", "proses", "produk"]
+                };
+                outputRenderOrder.push({ key: "diferensiasi", title: "C. Ide Pembelajaran Diferensiasi" });
+            }
+
+            if (inputs.buatSumatif) {
+                prompt += "\n- 5 Soal Asesmen Sumatif (Pilihan Ganda) lengkap dengan kunci jawaban.";
+                schemaProperties["asesmen_sumatif"] = {
+                    "type": "ARRAY",
+                    "description": "5 soal pilihan ganda (PG) untuk asesmen sumatif.",
+                    "items": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "soal": { "type": "STRING" },
+                            "opsi_a": { "type": "STRING" },
+                            "opsi_b": { "type": "STRING" },
+                            "opsi_c": { "type": "STRING" },
+                            "opsi_d": { "type": "STRING" },
+                            "kunci_jawaban": { "type": "STRING", "description": "Hanya hurufnya, misal: A" }
+                        },
+                        "propertyOrdering": ["soal", "opsi_a", "opsi_b", "opsi_c", "opsi_d", "kunci_jawaban"]
+                    }
+                };
+                outputRenderOrder.push({ key: "asesmen_sumatif", title: "D. Asesmen Sumatif (Pilihan Ganda)" });
+            }
+
+            // Asesmen Formatif selalu ada setelah Sumatif (jika ada) atau Diferensiasi
+            outputRenderOrder.push({ key: "asesmen_formatif", title: "E. Ide Asesmen Formatif" });
+
+
+            if (inputs.buatLkpd) {
+                prompt += "\n- LKPD (Lembar Kerja Peserta Didik) yang relevan dengan materi dan TP.";
+                schemaProperties["lkpd"] = {
+                    "type": "STRING",
+                    "description": "LKPD (Lembar Kerja Peserta Didik) lengkap dengan tujuan, petunjuk, dan tugas/pertanyaan. Diformat dalam Markdown."
+                };
+                outputRenderOrder.push({ key: "lkpd", title: "F. Lampiran: LKPD (Lembar Kerja Peserta Didik)" });
+            }
+
+            if (inputs.buatRubrik && inputs.keterampilan) {
+                prompt += `\n- Rubrik Penilaian untuk keterampilan: ${inputs.keterampilan}.`;
+                schemaProperties["rubrik"] = {
+                    "type": "STRING",
+                    "description": `Tabel rubrik penilaian (format Markdown) untuk menilai keterampilan: ${inputs.keterampilan}. Kolom berisi Kriteria, Skor 1 (Kurang), Skor 2 (Cukup), Skor 3 (Baik), Skor 4 (Sangat Baik).`
+                };
+                outputRenderOrder.push({ key: "rubrik", title: "G. Lampiran: Rubrik Penilaian" });
+            }
+
+            if (inputs.buatIceBreaking) {
+                prompt += "\n- 1 Ide Ice Breaking singkat.";
+                schemaProperties["ice_breaking"] = {
+                    "type": "STRING",
+                    "description": "Deskripsi singkat 1 ide ice breaking yang relevan atau umum."
+                };
+                outputRenderOrder.push({ key: "ice_breaking", title: "H. Lampiran: Ide Ice Breaking" });
+            }
+
+            if (inputs.buatVideo) {
+                prompt += "\n- 3 Rekomendasi Video YouTube (Judul dan URL) yang relevan dengan materi.";
+                schemaProperties["video_youtube"] = {
+                    "type": "ARRAY",
+                    "description": "3 rekomendasi video YouTube.",
+                    "items": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "judul": { "type": "STRING" },
+                            "url": { "type": "STRING", "description": "URL lengkap YouTube" }
+                        },
+                        "propertyOrdering": ["judul", "url"]
+                    }
+                };
+                outputRenderOrder.push({ key: "video_youtube", title: "I. Lampiran: Rekomendasi Video YouTube" });
+            }
+
+            const jsonSchema = {
+                "type": "OBJECT",
+                "properties": schemaProperties
+            };
+            
+            // Menyimpan urutan render untuk digunakan nanti
+            form.dataset.renderOrder = JSON.stringify(outputRenderOrder);
+
+            return { prompt, jsonSchema };
+        }
+
+
+        /**
+         * Memanggil Gemini API dengan penanganan backoff eksponensial
+         */
+        async function callGeminiAPI(payload, maxRetries = 3) {
+            let attempt = 0;
+            let delay = 1000; // 1 detik
+
+            while (attempt < maxRetries) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        // Jika status 429 (Too Many Requests) atau 5xx (Server Error), coba lagi
+                        if (response.status === 429 || response.status >= 500) {
+                            throw new Error(`API Error ${response.status}: Retrying...`);
+                        } else {
+                            // Error klien lain (misal 400 Bad Request), jangan coba lagi
+                            const errorBody = await response.json();
+                            console.error("API Client Error:", errorBody);
+                            throw new Error(errorBody.error?.message || `Gagal memuat data (Status: ${response.status})`);
+                        }
+                    }
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        
+                        const jsonText = result.candidates[0].content.parts[0].text;
+                        return JSON.parse(jsonText); // Berhasil, kembalikan JSON
+                    } else {
+                        throw new Error("Struktur respons API tidak valid atau konten kosong.");
+                    }
+
+                } catch (error) {
+                    console.warn(`Attempt ${attempt + 1} failed: ${error.message}`);
+                    attempt++;
+                    if (attempt >= maxRetries) {
+                        throw error; // Gagal setelah semua percobaan
+                    }
+                    // Tunggu sebelum mencoba lagi (exponential backoff)
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2; // Gandakan waktu tunggu
+                }
+            }
+        }
+
+        /**
+         * Merender output JSON ke format Markdown yang rapi
+         */
+        function renderOutput(data, inputs) {
+            let markdown = "";
+
+            // 1. Judul Utama
+            markdown += `# DRAF MODUL AJAR (RPP) - ${inputs.mapel.toUpperCase()}\n\n`;
+            markdown += `**Topik/Materi:** ${inputs.materi}\n`;
+            markdown += `**Jenjang/Kelas:** ${inputs.jenjang}\n`;
+            markdown += `**Alokasi Waktu:** ${inputs.alokasi}\n\n`;
+            
+            markdown += `## Tujuan Pembelajaran\n\n${inputs.tp.replace(/\n/g, '\n\n')}\n\n`;
+            if(inputs.model) markdown += `**Model Pembelajaran:** ${inputs.model}\n\n`;
+
+            // 2. Ambil urutan render dinamis
+            const renderOrder = JSON.parse(form.dataset.renderOrder);
+
+            // 3. Render setiap bagian sesuai urutan
+            for (const item of renderOrder) {
+                const key = item.key;
+                const title = item.title;
+                const content = data[key];
+
+                if (!content) continue; // Lewati jika data tidak ada
+
+                markdown += `## ${title}\n\n`;
+
+                // Logika render khusus berdasarkan 'key'
+                switch (key) {
+                    case "langkah_pembelajaran":
+                        markdown += `### 1. Kegiatan Pendahuluan\n\n${content.pendahuluan}\n\n`;
+                        markdown += `### 2. Kegiatan Inti\n\n${content.inti}\n\n`;
+                        markdown += `### 3. Kegiatan Penutup\n\n${content.penutup}\n\n`;
+                        break;
+                    
+                    case "diferensiasi":
+                        markdown += `* **Konten:** ${content.konten}\n`;
+                        markdown += `* **Proses:** ${content.proses}\n`;
+                        markdown += `* **Produk:** ${content.produk}\n\n`;
+                        break;
+
+                    case "asesmen_sumatif":
+                        content.forEach((soal, index) => {
+                            markdown += `${index + 1}. ${soal.soal}\n`;
+                            markdown += `    A. ${soal.opsi_a}\n`;
+                            markdown += `    B. ${soal.opsi_b}\n`;
+                            markdown += `    C. ${soal.opsi_c}\n`;
+                            markdown += `    D. ${soal.opsi_d}\n\n`;
+                        });
+                        markdown += `**Kunci Jawaban:**\n`;
+                        content.forEach((soal, index) => {
+                            markdown += `${index + 1}. ${soal.kunci_jawaban}\n`;
+                        });
+                        markdown += `\n`;
+                        break;
+
+                    case "video_youtube":
+                        content.forEach((video, index) => {
+                            markdown += `${index + 1}. **${video.judul}**\n`;
+                            markdown += `   [${video.url}](${video.url})\n\n`;
+                        });
+                        break;
+
+                    // Default untuk (rangkuman, formatif, lkpd, rubrik, ice_breaking)
+                    default:
+                        markdown += `${content}\n\n`;
+                        break;
+                }
+            }
+
+            // Simpan output mentah untuk disalin
+            currentMarkdownOutput = markdown;
+            
+            // Render Markdown ke HTML
+            output.innerHTML = marked.parse(markdown);
+            placeholder.classList.add('hidden');
+        }
+
+        /**
+         * Menangani status loading UI
+         */
+        function setLoading(isLoading) {
+            if (isLoading) {
+                generateText.textContent = 'Sedang Membuat...';
+                generateIcon.classList.remove('hidden');
+                generateTextIcon.classList.add('hidden');
+                generateBtn.disabled = true;
+                generateBtn.classList.add('opacity-75', 'cursor-not-allowed');
+                placeholder.classList.add('hidden');
+                output.innerHTML = ''; // Kosongkan output lama
+            } else {
+                generateText.textContent = 'Buat Perangkat Ajar';
+                generateIcon.classList.add('hidden');
+                generateTextIcon.classList.remove('hidden');
+                generateBtn.disabled = false;
+                generateBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+        }
+
+        /**
+         * Menampilkan pesan error
+         */
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+            output.innerHTML = ''; // Kosongkan output
+        }
+
+        /**
+         * Menyembunyikan pesan error
+         */
+        function hideError() {
+            errorMessage.classList.add('hidden');
+        }
+        
+        /**
+         * Menyalin teks Markdown ke clipboard
+         */
+        copyBtn.addEventListener('click', () => {
+            if (!currentMarkdownOutput) {
+                alert("Tidak ada hasil untuk disalin. Silakan buat perangkat ajar terlebih dahulu.");
+                return;
+            }
+
+            // Gunakan execCommand sebagai fallback untuk lingkungan iframe
+            const textarea = document.createElement('textarea');
+            textarea.value = currentMarkdownOutput;
+            textarea.style.position = 'fixed'; // Hindari lompatan layar
+            textarea.style.opacity = 0;
+            document.body.appendChild(textarea);
+            textarea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    copyText.textContent = 'Berhasil Disalin!';
+                    copyBtn.classList.add('bg-green-100', 'text-green-700');
+                    setTimeout(() => {
+                        copyText.textContent = 'Salin Hasil';
+                        copyBtn.classList.remove('bg-green-100', 'text-green-700');
+                    }, 2000);
+                } else {
+                    throw new Error('Gagal menyalin');
+                }
+            } catch (err) {
+                console.error('Fallback: Gagal menyalin teks', err);
+                alert('Gagal menyalin teks. Coba lagi secara manual.');
+            }
+
+            document.body.removeChild(textarea);
+        });
+
+    </script>
+</body>
+</html>
+
